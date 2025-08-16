@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import useAuth from '../hooks/useAuth';
 import { 
   Box, 
   Typography, 
@@ -9,64 +7,57 @@ import {
   CardActions,
   Grid,
   Avatar,
-  Divider,
-  CircularProgress
+  Divider
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
+import {CircularProgress} from '@mui/material';
 
 const Home = () => {
-  const { user, articles, loading, logout, token } = useAuth();//получаем данные из хука аутентификации
-  const navigate = useNavigate();
+    const { user, articles, logout } = useAuth();
+    const navigate = useNavigate();
 
-  // Если нет пользователя и загрузка завершена - перенаправляем на логин
-    useEffect(() => {
-    // Редиректим только если загрузка ЗАВЕРШЕНА и пользователя нет
-        if (!loading && !user && !token) {
-            navigate('/login');
-        }
-    }, [user, loading, navigate, token]);
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login', { replace: true });
+    };
 
-  if (loading) {//индикатор загрузки
+    if (!user) {
     return (
-      <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress size={60} />
-      </Box>
-    );
-  }
-
-  if (!user) {
-    return null; // Перенаправление уже обработано в useEffect
-  }
-
-  return (
-    <Box sx={{ p: 3 }}>
-      {/* Шапка с информацией о пользователе */}
-      <Box display="flex" alignItems="center" mb={4}>
-        <Avatar 
-          sx={{ width: 80, height: 80, mr: 3 }}
-          src={user.avatar || '/default-avatar.jpg'}
-        >
-          {user.username.charAt(0).toUpperCase()}
-        </Avatar>
-        <Box>
-          <Typography variant="h4" component="h1">
-            {user.username}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            {user.email}
-          </Typography>
-          <Button 
-            variant="outlined" 
-            color="error" 
-            onClick={logout}
-            sx={{ mt: 1 }}
-          >
-            Выйти
-          </Button>
+        <Box display="flex" justifyContent="center" mt={4}>
+            <CircularProgress size={60} />
         </Box>
-      </Box>
+    );
+    }
 
-      <Divider sx={{ my: 3 }} />
+    return (
+        <Box sx={{ p: 3 }}>
+            {/* Шапка с информацией о пользователе */}
+            <Box display="flex" alignItems="center" mb={4}>
+                <Avatar 
+                    sx={{ width: 80, height: 80, mr: 3 }}
+                    src={user.avatar || '/default-avatar.jpg'}
+                >
+                    {user.username.charAt(0).toUpperCase()}
+                </Avatar>
+            <Box>
+                <Typography variant="h4" component="h1">
+                    {user.username}
+                </Typography>
+                <Typography variant="subtitle1" color="text.secondary">
+                    {user.email}
+                </Typography>
+                <Button
+                    variant="outlined" 
+                    color="error" 
+                    sx={{ mt: 1 }}
+                    onClick={handleLogout}>
+                        Выйти
+                </Button>
+            </Box>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
 
       {/* Секция статей */}
       <Typography variant="h5" gutterBottom>

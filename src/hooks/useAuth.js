@@ -11,7 +11,6 @@ const useAuth = () => {
     const loadUserData = useCallback(async (token) => {
         setLoading(true);
         try {
-            //загрузка пользователя и его статей
             const [userData, userArticles] = await Promise.all([
                 getMe(token),
                 getMyArticles(token)
@@ -28,17 +27,17 @@ const useAuth = () => {
         }
     }, []);
 
-    const signUp = async (username, email, password) => {
+    /*const signUp = async (username, email, password) => {
         try {
             setLoading(true);
             const data = await registr(username, email, password);
-            
+
 
         } catch (error){
             console.error("Ошибка входа:", error);
             return false;
         }
-    };
+    };*/
 
     const signIn = async (username, password) => {
         try {
