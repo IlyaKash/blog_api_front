@@ -2,28 +2,34 @@ import axios from 'axios';
 
 const API_URL= 'http://localhost:8000';
 
-export const registr=async (username, email, password ) =>{
+export const registr = async (username, email, password) => {
     try {
-        const response= await axios.post(
+        const response = await axios.post(
             `${API_URL}/authentication/registr`,
-            `username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+            { username, email, password },
             {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                     'accept': 'application/json'
                 }
             }
         );
-        return response.data
+        
+        // Обрабатываем массив в ответе
+        if (Array.isArray(response.data) && response.data.includes("User created successfully")) {
+            return { message: "User created successfully" };
+        }
+        
+        return response.data;
     } catch (error) {
-        console.error("Ошибка авторизации:", {
+        console.error("Registration error:", {
             status: error.response?.status,
             data: error.response?.data,
             config: error.response?.config
         });
         throw error;
     }
-}
+};
 
 export const login = async (username, password) => {
     try {
@@ -64,7 +70,7 @@ export const getMyArticles=async (token) => {
 
 export const createArticle = async (content, token) => {
     await axios.post(`${API_URL}/article/create_article`, 
-        { content },  // Исправлено: передаем объект с полем content
+        { content },
         {
             headers: { 
                 Authorization: `Bearer ${token}`,

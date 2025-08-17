@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { login, getMe, getMyArticles } from '../api/api';
+import { login, getMe, getMyArticles, registr } from '../api/api';
 
 const useAuth = () => {
     const [user, setUser] = useState(null);//данные пользователя
@@ -27,17 +27,36 @@ const useAuth = () => {
         }
     }, []);
 
-    /*const signUp = async (username, email, password) => {
+    const signUp = async (username, email, password) => {
         try {
             setLoading(true);
             const data = await registr(username, email, password);
-
-
-        } catch (error){
-            console.error("Ошибка входа:", error);
+            
+            // Проверяем успешность регистрации
+            const isSuccess = data.message === "User created successfully" || 
+                            (Array.isArray(data) && data.includes("User created successfully"));
+            
+            if (isSuccess) {
+                // Автоматический вход после регистрации
+                const loginSuccess = await signIn(username, password);
+                return loginSuccess;
+            }
             return false;
+        } catch (error) {
+            console.error("Registration error details:", {
+                error: error.message,
+                response: error.response?.data
+            });
+            
+            // Анализ ошибки
+            if (error.response?.data?.detail) {
+                throw new Error(error.response.data.detail);
+            }
+            throw new Error('Ошибка регистрации');
+        } finally {
+            setLoading(false);
         }
-    };*/
+    };
 
     const signIn = async (username, password) => {
         try {
@@ -68,8 +87,7 @@ const useAuth = () => {
         if (token && !user) {//если есть токен, но нет данных загружаем их
             loadUserData(token);
         }
-    }, [token, user, loadUserData]);//зависимости
-
+    }, [token, user, loadUserData]);
     return {
         user,
         articles,
@@ -77,6 +95,7 @@ const useAuth = () => {
         token,
         signIn,
         logout,
+        signUp,
         isAuthenticated: !!user
     };
 };

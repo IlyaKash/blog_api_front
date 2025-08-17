@@ -16,7 +16,7 @@ export const Login = () => {
         try {
             const success = await signIn(username, password);
             if (success) {
-                navigate('/', { replace: true }); // Добавьте replace: true
+                navigate('/', { replace: true });
             } else {
                 setError('Неверное имя пользователя или пароль');
             }
@@ -48,6 +48,9 @@ export const Login = () => {
                 />
                 <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                     Войти
+                </Button>
+                <Button variant='contained' fullWidth sx={{mt:2}} onClick={() => navigate('/register')}>
+                    Зарегестрироваться
                 </Button>
             </form>
         </Box>
