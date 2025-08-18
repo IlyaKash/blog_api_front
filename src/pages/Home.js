@@ -10,22 +10,31 @@ import {
   Divider
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
 import {CircularProgress} from '@mui/material';
+import { useAuth } from '../context/AuthContext';
+
+
+
 
 const Home = () => {
   const { user, articles, logout } = useAuth();
   const navigate = useNavigate();
+
+
   const handleLogout = async () => {
       await logout();
       navigate('/login', { replace: true });
   };
+
+
   if (!user) {
   return (
       <Box display="flex" justifyContent="center" mt={4}>
           <CircularProgress size={60} />
       </Box>
   );
+
+  
   }
   return (
       <Box sx={{ p: 3 }}>

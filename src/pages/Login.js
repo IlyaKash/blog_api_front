@@ -1,58 +1,61 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
+import { useAuth } from '../context/AuthContext';
 import { TextField, Button, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const { signIn } = useAuth();
-    const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, error: authError, loading } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        try {
-            const success = await signIn(username, password);
-            if (success) {
-                navigate('/', { replace: true });
-            } else {
-                setError('Неверное имя пользователя или пароль');
-            }
-        } catch (err) {
-            setError('Ошибка при входе в систему');
-            console.error("Login error:", err);
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const success = await login(username, password);
+    if (success) navigate('/');
+  };
 
-    return (
-        <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
-            <Typography variant="h4" sx={{ mb: 2 }}>Вход</Typography>
-            {error && <Typography color="error">{error}</Typography>}
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Имя пользователя"
-                    fullWidth
-                    margin="normal"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <TextField
-                    label="Пароль"
-                    type="password"
-                    fullWidth
-                    margin="normal"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-                    Войти
-                </Button>
-                <Button variant='contained' fullWidth sx={{mt:2}} onClick={() => navigate('/register')}>
-                    Зарегестрироваться
-                </Button>
-            </form>
-        </Box>
-    );
+  return (
+    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>Вход</Typography>
+      {authError && <Typography color="error">{authError}</Typography>}
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Имя пользователя"
+          fullWidth
+          margin="normal"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          disabled={loading}
+        />
+        <TextField
+          label="Пароль"
+          type="password"
+          fullWidth
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
+        />
+        <Button 
+          type="submit" 
+          variant="contained" 
+          fullWidth 
+          sx={{ mt: 2 }}
+          disabled={loading}
+        >
+          {loading ? 'Вход...' : 'Войти'}
+        </Button>
+        <Button 
+          variant="outlined" 
+          fullWidth 
+          sx={{ mt: 2 }}
+          onClick={() => navigate('/register')}
+          disabled={loading}
+        >
+          Зарегистрироваться
+        </Button>
+      </form>
+    </Box>
+  );
 };

@@ -1,39 +1,25 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { TextField, Button, Box, Typography } from "@mui/material";
-import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 
 export const Register = () =>{
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] =useState('');
-
-    const [error, setError] = useState('');
-
-    const {signUp} = useAuth();
-
+    const { register, error: authError, loading } = useAuth();
     const navigate=useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
 
         try {
-            const success = await signUp(username, email, password);
+            const success = await register(username, email, password);
             if (success) {
-                navigate('/', { replace: true });
-            } else {
-                setError('Не удалось завершить регистрацию');
+                navigate('/');
             }
         } catch (err) {
-            const errorMsg = err.message.includes('already exists') 
-                ? 'Пользователь уже существует' 
-                : err.message.includes('validation')
-                ? 'Некорректные данные'
-                : 'Ошибка при регистрации';
-            
-            setError(errorMsg);
             console.error("Registration error:", err);
         }
     };
@@ -41,7 +27,7 @@ export const Register = () =>{
     return (
         <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}> 
             <Typography>Регестрация</Typography>
-            {error && <Typography color="error">{error}</Typography>}
+            {authError && <Typography color="error">{authError}</Typography>}
             <form onSubmit={handleSubmit}>
                 <TextField
                     label="Имя пользователя"
@@ -49,6 +35,7 @@ export const Register = () =>{
                     margin="normal"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    disabled={loading}
                 />
                 <TextField
                     label="E-mail"
@@ -57,6 +44,7 @@ export const Register = () =>{
                     margin="normal"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
                 />
                 <TextField
                     label="Пароль"
@@ -65,11 +53,12 @@ export const Register = () =>{
                     margin="normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
                 />
-                <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+                <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }} disabled={loading}>
                     Зарегестрироваться
                 </Button>
-                <Button variant='contained' fullWidth sx={{mt:2}} onClick={() => navigate('/login')}>
+                <Button variant='contained' fullWidth sx={{mt:2}} onClick={() => navigate('/login')} disabled={loading}>
                     Войти
                 </Button>
             </form>

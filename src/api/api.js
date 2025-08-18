@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL= 'http://localhost:8000';
 
-export const registr = async (username, email, password) => {
+export const register = async (username, email, password) => {
     try {
         const response = await axios.post(
             `${API_URL}/authentication/registr`,
@@ -20,7 +20,7 @@ export const registr = async (username, email, password) => {
             return { message: "User created successfully" };
         }
         
-        return response.data;
+        return response.data.access_token;
     } catch (error) {
         console.error("Registration error:", {
             status: error.response?.status,
@@ -43,7 +43,7 @@ export const login = async (username, password) => {
                 }
             }
         );
-        return response.data;
+        return response.data.access_token;
     } catch (error) {
         console.error("Ошибка авторизации:", {
             status: error.response?.status,
